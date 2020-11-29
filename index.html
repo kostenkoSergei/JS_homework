@@ -10,105 +10,130 @@
 <body>
     <script>
         /*
-        1. С помощью цикла while вывести все простые числа в промежутке от 0 до 100.
+        1. Написать функцию, преобразующую число в объект. Передавая на вход число от 0 до 999, надо 
+        получить на выходе объект, в котором в соответствующих свойствах описаны единицы, десятки и сотни. 
+        Например, для числа 245 надо получить следующий объект: {‘единицы’: 5, ‘десятки’: 4, ‘сотни’: 2}. 
+        Если число превышает 999, необходимо выдать соответствующее сообщение с помощью console.log и 
+        вернуть пустой объект.
         */
-        // число является простым, если оно больше 1 и при этом делится без остатка только на себя.
 
-
-        let j = 1;
-        let k;
-        let output = ''; // решил вывести в одну строку, чтобы было красивее
-
-        nextPrimeNumber:
-        while (j <= 99) {
-            j++
-            k = 2;
-            while (k < j) {
-                if (j % k == 0) {
-                    k++
-                    continue nextPrimeNumber;
+        let userNumber = prompt('Введите число от 0 до 999: ');
+        function numberToObject(num) {
+            let userObject = {};
+            if (+num > 999) {
+                console.log(`Необходимо ввести число в диапазоне 0 ... 999 ${userObject}`)
+            }
+            else {
+                let str = userNumber.split('').reverse();
+                userObject = {
+                    'units': +str[0],
+                    'tens': str[1] == undefined ? 0 : +str[1],
+                    'hundreds': str[2] == undefined ? 0 : +str[2]
                 }
-                k++
+                console.log(userObject);
             }
-            output += j + ' ';
         }
 
-        console.log(output);
+        numberToObject(userNumber);
 
         /*
-        2. С этого урока начинаем работать с функционалом интернет-магазина. Предположим, есть сущность корзины. 
-        Нужно реализовать функционал подсчета стоимости корзины в зависимости от находящихся в ней товаров. 
+        2. Продолжить работу с интернет-магазином:
+        В прошлом домашнем задании вы реализовали корзину на базе массивов. Какими объектами можно заменить их элементы?
+        Реализуйте такие объекты.
+        Перенести функционал подсчета корзины на объектно-ориентированную базу.
         */
-        /* 
-        3. Товары в корзине хранятся в массиве. Задачи:
-        - Организовать такой массив для хранения товаров в корзине;
-        - Организовать функцию countBasketPrice, которая будет считать стоимость корзины.
-        */
-
-        let basket = new Array();
-        basket.push(
-            { name: 'first item', price: 1200, amount: 2 },
-            { name: 'second item', price: 1500, amount: 1 },
-            { name: 'third item', price: 3000, amount: 5 }
-        );
-
-        // вариант с обычным циклом
-        function countBasketPrice1(arr) {
-            let price = 0;
-            for (let i = 0; i < arr.length; i++) {
-                price += (arr[i]['price'] * arr[i]['amount'])
+        let userBasket = {
+            basket: {},
+            addToBasket: function (item) {
+                this.basket[item.name] = { price: item.price, amount: item.amount }
+            },
+            addItemAmount: function (itemName) {
+                this.basket[itemName]['amount'] += 1; // увеличиваем число едениц товара
+            },
+            countBasketPrice: function () {
+                let basketPrice = 0;
+                for (item in this.basket) {
+                    basketPrice += (this.basket[item]['price'] * this.basket[item]['amount'])
+                }
+                return basketPrice;
             }
-            return price;
+
         }
 
-        // вариант с более лаконичной реализацией цикла
-        function countBasketPrice2(arr) {
-            let price = 0;
-            for (item of basket) {
-                price += (item.price * item.amount)
-            }
-            return price;
+        function Product(name, price, amount) {
+            this.name = name;
+            this.amount = amount;
+            this.price = price;
+            return { name: this.name, price: this.price, amount: this.amount }
         }
 
-        // вариант с reduce
-        function countBasketPrice3(arr) {
-            return arr.reduce(((acc, cur) => acc + (cur.price * cur.amount)), 0);
-        }
+        let item1 = new Product('first item', 1200, 1)
+        let item2 = new Product('second item', 1500, 1)
+        let item3 = new Product('third item', 3000, 1)
 
-        // вариант с forEach
-        function countBasketPrice4(arr) {
-            let price = 0;
-            arr.forEach(elem => price += elem.amount * elem.price);
-            return price;
-        }
+        userBasket.addToBasket(item1);
+        userBasket.addToBasket(item2);
+        userBasket.addToBasket(item3);
 
-        alert(`Суммарная стоимость товаров в корзине (1 вариант): ${countBasketPrice1(basket)} рублей`)
-        alert(`Суммарная стоимость товаров в корзине (2 вариант): ${countBasketPrice2(basket)} рублей`)
-        alert(`Суммарная стоимость товаров в корзине (3 вариант): ${countBasketPrice3(basket)} рублей`)
-        alert(`Суммарная стоимость товаров в корзине (4 вариант): ${countBasketPrice4(basket)} рублей`)
+        // тестируем изначальное состояние корзины
+        alert(`Суммарная стоимость товаров в корзине: ${userBasket.countBasketPrice()} рублей`)
 
-        /* 
-        4. * Вывести с помощью цикла for числа от 0 до 9, не используя тело цикла. Выглядеть это должно так:
-        for(...){// здесь пусто}
-        */
-        for (let i = 0; i <= 9; console.log(i++)) {
-            //empty body
-        }
+        //тестируем состояние корзины после увеличения количества едениц продукта
+        userBasket.addItemAmount('first item') // увеличиваем число едениц первого товара
+        userBasket.addItemAmount('second item') // увеличиваем число едениц второго товара
+        alert(`Суммарная стоимость товаров в корзине: ${userBasket.countBasketPrice()} рублей`)
+
+
 
         /*
-        5.  * Нарисовать пирамиду с 20 рядами с помощью console.log, как показано на рисунке:
-        x
-        xx
-        xxx
-        xxxx
-        xxxxx
+        3. * Подумать над глобальными сущностями. К примеру, сущность «Продукт» в интернет-магазине
+        актуальна не только для корзины, но и для каталога. Стремиться нужно к тому, чтобы объект
+        «Продукт» имел единую структуру для различных модулей сайта, но в разных местах давал возможность
+        вызывать разные методы.
         */
 
-        let str = '';
-        for (let i = 1; i <= 20; i++) {
-            str += '*'
-            console.log(str + ' ' + i + ' row')
+        let product = {
+            promo: {
+                sale5: 0.05,
+                sale10: 0.1,
+                sale15: 0.15,
+                sale20: 0.20
+            },
+            code: 'MP002XM0RGXF',
+            name: 'some boots',
+            color: 'black',
+            size: 41,
+            amount: 1,
+            priceForItem: 10000,
+            getPrice: function () {
+                return this.priceForItem; // возвращает текущую цену товара
+            },
+            addAmount: function (newAmount) {
+                this.amount = newAmount; // для увеличения количества товаров одной позиции
+                if (this.amount >= 3) this.priceForItem *= 0.9; // если покупается больше двух товаров, изменяем цену
+            },
+            setDefaultAmount: function () {
+                this.amount = 1; // устанавливает дефолтное количество товаро
+            },
+            setDefaultPrice: function () {
+                this.priceForItem = 10000;
+            },
+            getPromo: function (promocode) {
+                this.priceForItem -= this.priceForItem * this.promo[promocode];
+            }
+
         }
+        console.log('Initial price:')
+        console.log(product.getPrice())
+        product.addAmount(3);
+        console.log('Price for amount if number of items >= 3:');
+        console.log(product.getPrice())
+        product.setDefaultAmount();
+        product.setDefaultPrice();
+        product.getPromo('sale15');
+        console.log('Price for one item afrer using promo code:');
+        console.log(product.getPrice());
+
     </script>
 </body>
 
