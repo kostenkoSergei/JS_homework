@@ -5,43 +5,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
+    <div class="basket">
+    </div>
+
     <script>
         /*
-        1. Написать функцию, преобразующую число в объект. Передавая на вход число от 0 до 999, надо 
-        получить на выходе объект, в котором в соответствующих свойствах описаны единицы, десятки и сотни. 
-        Например, для числа 245 надо получить следующий объект: {‘единицы’: 5, ‘десятки’: 4, ‘сотни’: 2}. 
-        Если число превышает 999, необходимо выдать соответствующее сообщение с помощью console.log и 
-        вернуть пустой объект.
+        1. Создать функцию, генерирующую шахматную доску. Можно использовать любые html-теги.
+        Доска должна быть верно разлинована на черные и белые ячейки. Строки должны нумероваться
+        числами от 1 до 8, столбцы — латинскими буквами A, B, C, D, E, F, G, H.
         */
 
-        let userNumber = prompt('Введите число от 0 до 999: ');
-        function numberToObject(num) {
-            let userObject = {};
-            if (+num > 999) {
-                console.log(`Необходимо ввести число в диапазоне 0 ... 999 ${userObject}`)
-            }
-            else {
-                let str = userNumber.split('').reverse();
-                userObject = {
-                    'units': +str[0],
-                    'tens': str[1] == undefined ? 0 : +str[1],
-                    'hundreds': str[2] == undefined ? 0 : +str[2]
-                }
-                console.log(userObject);
+        let letters = ['', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+        let numbers = [8, 7, 6, 5, 4, 3, 2, 1]
+        function createBlackCell() {
+            let blackCell = document.createElement('div');
+            blackCell.className = 'black';
+            return blackCell;
+        }
+
+        function createWhiteCell() {
+            let whiteCell = document.createElement('div');
+            whiteCell.className = 'white';
+            return whiteCell;
+        }
+
+        function createSign() {
+            let signCell = document.createElement('div');
+            signCell.className = 'sign';
+            return signCell;
+        }
+
+        function createRow(num) {
+            let row = document.createElement('div');
+            row.className = 'row';
+            document.body.appendChild(row);
+            let number = createSign();
+            number.innerHTML = num;
+            row.appendChild(number);
+            return row
+        }
+
+        function createStartWhite(num) {
+            row = createRow(num);
+            for (i = 0; i < 4; i++) {
+                row.appendChild(createWhiteCell());
+                row.appendChild(createBlackCell());
             }
         }
 
-        numberToObject(userNumber);
+        function createStartBlack(num) {
+            row = createRow(num);
+            for (i = 0; i < 4; i++) {
+                row.appendChild(createBlackCell());
+                row.appendChild(createWhiteCell());
+            }
+        }
+        function drawСhessboard() {
+            k = 0;
+            v = 1;
+            for (j = 0; j < 4; j++) {
+                createStartWhite(numbers[k]);
+                createStartBlack(numbers[v]);
+                k += 2;
+                v += 2;
+            }
+
+            for (k = 0; k <= 8; k++) {
+                let el = createSign();
+                document.body.appendChild(el);
+                el.innerHTML = letters[k];
+            }
+
+        }
+
+        drawСhessboard();
 
         /*
-        2. Продолжить работу с интернет-магазином:
-        В прошлом домашнем задании вы реализовали корзину на базе массивов. Какими объектами можно заменить их элементы?
-        Реализуйте такие объекты.
-        Перенести функционал подсчета корзины на объектно-ориентированную базу.
+        2. Сделать генерацию корзины динамической: верстка корзины не должна находиться в HTML-структуре. 
+        Там должен быть только div, в который будет вставляться корзина, сгенерированная на базе JS:
+        Пустая корзина должна выводить строку «Корзина пуста»;
+        Наполненная должна выводить «В корзине: n товаров на сумму m рублей».
         */
+        let isEmpty = +prompt('Введите 0, чтобы отобразить пустую корзину, 1 - для отображения полной: ')
+
         let userBasket = {
             basket: {},
             addToBasket: function (item) {
@@ -52,10 +102,12 @@
             },
             countBasketPrice: function () {
                 let basketPrice = 0;
+                let basketAmount = 0;
                 for (item in this.basket) {
-                    basketPrice += (this.basket[item]['price'] * this.basket[item]['amount'])
+                    basketPrice += (this.basket[item]['price'] * this.basket[item]['amount']);
+                    basketAmount += this.basket[item]['amount'];
                 }
-                return basketPrice;
+                return [basketPrice, basketAmount];
             }
 
         }
@@ -74,65 +126,31 @@
         userBasket.addToBasket(item1);
         userBasket.addToBasket(item2);
         userBasket.addToBasket(item3);
-
-        // тестируем изначальное состояние корзины
-        alert(`Суммарная стоимость товаров в корзине: ${userBasket.countBasketPrice()} рублей`)
-
-        //тестируем состояние корзины после увеличения количества едениц продукта
         userBasket.addItemAmount('first item') // увеличиваем число едениц первого товара
         userBasket.addItemAmount('second item') // увеличиваем число едениц второго товара
-        alert(`Суммарная стоимость товаров в корзине: ${userBasket.countBasketPrice()} рублей`)
 
-
-
-        /*
-        3. * Подумать над глобальными сущностями. К примеру, сущность «Продукт» в интернет-магазине
-        актуальна не только для корзины, но и для каталога. Стремиться нужно к тому, чтобы объект
-        «Продукт» имел единую структуру для различных модулей сайта, но в разных местах давал возможность
-        вызывать разные методы.
-        */
-
-        let product = {
-            promo: {
-                sale5: 0.05,
-                sale10: 0.1,
-                sale15: 0.15,
-                sale20: 0.20
-            },
-            code: 'MP002XM0RGXF',
-            name: 'some boots',
-            color: 'black',
-            size: 41,
-            amount: 1,
-            priceForItem: 10000,
-            getPrice: function () {
-                return this.priceForItem; // возвращает текущую цену товара
-            },
-            addAmount: function (newAmount) {
-                this.amount = newAmount; // для увеличения количества товаров одной позиции
-                if (this.amount >= 3) this.priceForItem *= 0.9; // если покупается больше двух товаров, изменяем цену
-            },
-            setDefaultAmount: function () {
-                this.amount = 1; // устанавливает дефолтное количество товаро
-            },
-            setDefaultPrice: function () {
-                this.priceForItem = 10000;
-            },
-            getPromo: function (promocode) {
-                this.priceForItem -= this.priceForItem * this.promo[promocode];
+        function createBasketView() {
+            let basketView = document.getElementsByClassName('basket');
+            let basketImg = document.createElement('img');
+            basketImg.src = "img/basket.png";
+            basketImg.style.maxWidth = '50px';
+            let basketText = document.createElement('p');
+            basketText.className = 'basketText';
+            basketView[0].appendChild(basketImg);
+            basketView[0].appendChild(basketText);
+            if (isEmpty == 0) {
+                basketText.innerText = 'Корзина пуста';
             }
-
+            else if (isEmpty == 1) {
+                res = userBasket.countBasketPrice();
+                basketText.innerText = `В корзине: ${res[1]} товаров на сумму ${res[0]} рублей`
+            }
+            else alert('Введите либо 0, либо 1')
         }
-        console.log('Initial price:')
-        console.log(product.getPrice())
-        product.addAmount(3);
-        console.log('Price for amount if number of items >= 3:');
-        console.log(product.getPrice())
-        product.setDefaultAmount();
-        product.setDefaultPrice();
-        product.getPromo('sale15');
-        console.log('Price for one item afrer using promo code:');
-        console.log(product.getPrice());
+
+        createBasketView();
+
+
 
     </script>
 </body>
