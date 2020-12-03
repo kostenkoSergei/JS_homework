@@ -11,6 +11,9 @@
 <body>
     <div class="basket">
     </div>
+    <div id="catalog">
+
+    </div>
 
     <script>
         /*
@@ -21,16 +24,18 @@
 
         let letters = ['', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
         let numbers = [8, 7, 6, 5, 4, 3, 2, 1]
-        function createBlackCell() {
+        function createCell(color) {
             let blackCell = document.createElement('div');
-            blackCell.className = 'black';
-            return blackCell;
-        }
-
-        function createWhiteCell() {
             let whiteCell = document.createElement('div');
-            whiteCell.className = 'white';
-            return whiteCell;
+            if (color == 'black') {
+                blackCell.className = 'black';
+                return blackCell;
+            }
+            else if (color == 'white') {
+                whiteCell.className = 'white';
+                return whiteCell;
+            }
+
         }
 
         function createSign() {
@@ -49,36 +54,42 @@
             return row
         }
 
-        function createStartWhite(num) {
+        function createCellRow(num, flag) {
             row = createRow(num);
-            for (i = 0; i < 4; i++) {
-                row.appendChild(createWhiteCell());
-                row.appendChild(createBlackCell());
+            if (flag) {
+                for (i = 0; i < 4; i++) {
+                    row.appendChild(createCell('white'));
+                    row.appendChild(createCell('black'));
+                }
+            }
+            else {
+                for (i = 0; i < 4; i++) {
+                    row.appendChild(createCell('black'));
+                    row.appendChild(createCell('white'));
+                }
             }
         }
 
-        function createStartBlack(num) {
-            row = createRow(num);
-            for (i = 0; i < 4; i++) {
-                row.appendChild(createBlackCell());
-                row.appendChild(createWhiteCell());
-            }
-        }
-        function drawСhessboard() {
-            k = 0;
-            v = 1;
-            for (j = 0; j < 4; j++) {
-                createStartWhite(numbers[k]);
-                createStartBlack(numbers[v]);
-                k += 2;
-                v += 2;
-            }
 
+        function createLetterRow(k) {
             for (k = 0; k <= 8; k++) {
                 let el = createSign();
                 document.body.appendChild(el);
                 el.innerHTML = letters[k];
             }
+        }
+
+        function drawСhessboard() {
+            k = 0;
+            v = 1;
+            createLetterRow(k, v)
+            for (j = 0; j < 4; j++) {
+                createCellRow(numbers[k], 1);
+                createCellRow(numbers[v], 0);
+                k += 2;
+                v += 2;
+            }
+            createLetterRow(k)
 
         }
 
@@ -112,16 +123,19 @@
 
         }
 
-        function Product(name, price, amount) {
+        function Product(name, code, size, color, price, amount) {
             this.name = name;
+            this.code = code;
+            this.size = size;
+            this.color = color;
             this.amount = amount;
             this.price = price;
-            return { name: this.name, price: this.price, amount: this.amount }
+            return { name: this.name, code: this.code, size: this.size, color: this.color, price: this.price, amount: this.amount }
         }
 
-        let item1 = new Product('first item', 1200, 1)
-        let item2 = new Product('second item', 1500, 1)
-        let item3 = new Product('third item', 3000, 1)
+        let item1 = new Product('first item', 'MP002XM0RGXF', 41, 'black', 1200, 1)
+        let item2 = new Product('second item', 'LP002XD0RGXF', 48, 'green', 1500, 1)
+        let item3 = new Product('third item', 'VP002FM0RGF', 50, 'white', 3000, 1)
 
         userBasket.addToBasket(item1);
         userBasket.addToBasket(item2);
@@ -139,18 +153,43 @@
             basketView[0].appendChild(basketImg);
             basketView[0].appendChild(basketText);
             if (isEmpty == 0) {
-                basketText.innerText = 'Корзина пуста';
+                basketText.innerText = ' Корзина пуста';
             }
             else if (isEmpty == 1) {
                 res = userBasket.countBasketPrice();
-                basketText.innerText = `В корзине: ${res[1]} товаров на сумму ${res[0]} рублей`
+                basketText.innerText = ` В корзине: ${res[1]} товаров на сумму ${res[0]} рублей`
             }
             else alert('Введите либо 0, либо 1')
         }
 
         createBasketView();
 
+        /*
+        * Сделать так, чтобы товары в каталоге выводились при помощи JS: Создать массив товаров (сущность Product);
+        При загрузке страницы на базе данного массива генерировать вывод из него.
+        HTML-код должен содержать только div id=”catalog” без вложенного кода. Весь вид каталога генерируется JS.
+         */
 
+        let productsCatalog = [item1, item2, item3];
+
+        function showCatalog(products) {
+            let catalogView = document.querySelector('#catalog');
+            let catalog = document.createElement('p')
+            catalog.textContent = 'Каталог:';
+            catalog.classList.add('catalogText');
+            catalogView.appendChild(catalog);
+            let productList = document.createElement('ul');
+            productList.classList.add('list-group')
+            for (i = 0; i < products.length; i++) {
+                let item = document.createElement('li');
+                item.classList.add('list-group-item')
+                product = products[i]
+                item.textContent = `name: ${product.name}; size: ${product.size};  color: ${product.color}; code: ${product.code}; price: ${product.price};`
+                productList.appendChild(item);
+            }
+            catalogView.appendChild(productList);
+        }
+        showCatalog(productsCatalog);
 
     </script>
 </body>

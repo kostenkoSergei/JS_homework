@@ -44,3 +44,22 @@
     font-size: large;
     margin-left: 30px;
 }
+
+.list-group {
+    -webkit-box-direction: normal;
+}
+
+.list-group-item {
+    position: relative;
+    display: block;
+    padding: .75rem 1.25rem;
+    margin-bottom: -1px;
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, .125);
+    width: 40%;
+}
+
+.catalogText {
+    font-size: large;
+    margin-left: 45px;
+}
