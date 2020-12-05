@@ -1,0 +1,6 @@
+.card {
+    display: flex;
+    max-width: 300px;
+    justify-content: space-between;
+    align-items: center;
+}
