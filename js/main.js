@@ -29,12 +29,10 @@ function Product(name, code, size, color, price, amount, img) {
     return { name: this.name, code: this.code, size: this.size, color: this.color, price: this.price, amount: this.amount, img: this.img }
 }
 
-let item1 = new Product('first item', 'MP002XM0RGXF', 41, 'black', 1200, 1, 'cat1')
-let item2 = new Product('second item', 'LP002XD0RGXF', 48, 'green', 1500, 1, 'cat2')
-let item3 = new Product('third item', 'VP002FM0RGF', 50, 'white', 3000, 1, 'cat3')
+let item1 = new Product('first item', 'MP002XM0RGXF', 41, 'black', 1200, 1, ['cat1', 'cat1.1', 'cat1.2'])
+let item2 = new Product('second item', 'LP002XD0RGXF', 48, 'green', 1500, 1, ['cat2', 'cat2.1', 'cat2.2'])
+let item3 = new Product('third item', 'VP002FM0RGF', 50, 'white', 3000, 1, ['cat3', 'cat3.1', 'cat3.2'])
 
-// userBasket.addItemAmount('first item') // увеличиваем число едениц первого товара
-// userBasket.addItemAmount('second item') // увеличиваем число едениц второго товара
 
 function createBasketView() {
     let basketView = document.getElementsByClassName('basket');
@@ -45,6 +43,13 @@ function createBasketView() {
     let basketText = document.createElement('p');
     basketText.className = 'basket-text';
     basketView[0].appendChild(basketText);
+}
+
+
+function hidePopup() {
+    let popup = document.querySelector('.popup');
+    popup.classList.remove('open');
+
 }
 
 function viewBasketPrice() {
@@ -78,11 +83,13 @@ function showCatalog(products) {
         let productCard = document.createElement('div');
         productCard.classList.add('card')
         productCard.style.width = '18rem';
+
         let productImg = document.createElement('img');
-        productImg.src = `img/${product.img}.jpg`;
+        productImg.src = `img/${product.img[0]}.jpg`;
         productImg.style.maxWidth = '150px';
         productImg.style.maxHeight = '250px';
-        productImg.classList.add("card-img-top");
+        productImg.classList.add(`card-img-top`, `img-${i}`);
+        productImg.productId = product;
 
         let productDescription = document.createElement('div');
         productCard.classList.add("card-body");
@@ -116,10 +123,24 @@ function showCatalog(products) {
 
         let btnAddtoBasket = document.querySelector(`.btn-${i}`);
         let btnAddtoAmount = document.querySelector(`.btn-add-${i}`);
+        let boundPopup = document.querySelector(`.img-${i}`);
+        console.log(boundPopup)
         btnAddtoBasket.addEventListener("click", (event) => userBasket.addToBasket(event.target.productId)); //добавление в корзину
         btnAddtoAmount.addEventListener("click", (event) => userBasket.addItemAmount(event.target.productId.name)); //увеличение количества в корзине
+        boundPopup.addEventListener("click", function (event) {
+            let popup = document.querySelector('.popup');
+            popup.classList.add('open');
+            let popupImg1 = document.querySelector('.popup-img1');
+            popupImg1.src = `img/${event.target.productId.img[0]}.jpg`;
+            let popupImg2 = document.querySelector('.popup-img2');
+            popupImg2.src = `img/${event.target.productId.img[1]}.jpg`;
+            let popupImg3 = document.querySelector('.popup-img3');
+            popupImg3.src = `img/${event.target.productId.img[2]}.jpg`;
+        });
 
     }
-
+    let btnClosePopup = document.querySelector('.popup__close');
+    console.log(btnClosePopup)
+    btnClosePopup.addEventListener('click', hidePopup);
 }
 showCatalog(productsCatalog);
