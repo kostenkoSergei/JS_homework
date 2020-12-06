@@ -60,3 +60,15 @@
     top: 10px;
     font-size: 15px;
 }
+
+.carousel-control-next-icon:after {
+    content: '>';
+    font-size: 55px;
+    color: #9e9e9e;
+}
+
+.carousel-control-prev-icon:after {
+    content: '<';
+    font-size: 55px;
+    color: #9e9e9e;
+}
