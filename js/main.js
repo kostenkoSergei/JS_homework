@@ -140,7 +140,6 @@ function showCatalog(products) {
 
     }
     let btnClosePopup = document.querySelector('.popup__close');
-    console.log(btnClosePopup)
     btnClosePopup.addEventListener('click', hidePopup);
 }
 showCatalog(productsCatalog);
