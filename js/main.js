@@ -1,10 +1,13 @@
 let userBasket = {
     basket: {},
     addToBasket: function (item) {
-        this.basket[item.name] = { price: item.price, amount: item.amount }
+        this.basket[item.name] = { name: item.name, price: item.price, amount: item.amount, img: item.img }
     },
     addItemAmount: function (itemName) {
-        this.basket[itemName]['amount'] += 1; // увеличиваем число едениц товара
+        console.log(itemName)
+        if (itemName in this.basket) {
+            this.basket[itemName]['amount'] += 1; // увеличиваем число едениц товара
+        }
     },
     countBasketPrice: function () {
         let basketPrice = 0;
@@ -43,6 +46,7 @@ function createBasketView() {
     let basketText = document.createElement('p');
     basketText.className = 'basket-text';
     basketView[0].appendChild(basketText);
+    basketText.textContent = ` Корзина пуста`
 }
 
 
@@ -56,19 +60,62 @@ function viewBasketPrice() {
 
     let res = userBasket.countBasketPrice();
     let basketText = document.querySelector('.basket-text');
-    basketText.textContent = ` В корзине: ${res[1]} товаров на сумму ${res[0]} рублей`
-    let basketBackground = document.querySelector('.card');
-    if (Object.keys(userBasket.basket).length == 0) {
-        basketBackground.style.background = '#ea80fc';
+    if (res[1] == 0) {
+        basketText.textContent = `  Корзина пуста`
     }
     else {
-        basketBackground.style.background = '#64ffda';
+        basketText.textContent = ` В корзине: ${res[1]} товаров на сумму ${res[0]} рублей`
+    }
+
+}
+
+
+// Показывает содержимое корзины
+function showBasketContent() {
+    let basketContent = document.querySelector('.basket-content');
+    while (basketContent.firstChild) {
+        basketContent.removeChild(basketContent.firstChild);
+    }
+    basketItems = Object.values(userBasket.basket)
+    for (let i = 0; i < basketItems.length; i++) {
+        let basketItem = document.createElement('li');
+        basketItem.classList.add('item-list');
+        basketItem.classList.add('list-group-item', 'basket-item')
+        let itemImg = document.createElement('img');
+        itemImg.src = `img/${basketItems[i].img[0]}.jpg`;
+        itemImg.style.maxWidth = '10%';
+
+        let itemInfo = document.createElement('p');
+        itemInfo.innerHTML = `&nbsp&nbsp&nbspнаименование: ${basketItems[i].name}  |   кол-во: ${basketItems[i].amount}  |  цена за 1 шт.: ${basketItems[i].price}&nbsp`;
+
+        let deleteBtn = document.createElement('a');
+        deleteBtn.classList.add('btn', 'btn-primary', 'btn-sm');
+        deleteBtn.innerText = 'удалить';
+        deleteBtn.productId = basketItems[i].name;
+        deleteBtn.addEventListener("click", (event) => deleteItemFromBasket(event.target.productId)); //удаляем товар из корзины
+
+        basketItem.appendChild(itemImg);
+        basketItem.appendChild(itemInfo);
+        basketItem.appendChild(deleteBtn);
+
+        basketContent.appendChild(basketItem);
     }
 }
 
+// Удаляет элемент из корзины
+function deleteItemFromBasket(itemName) {
+    console.log(itemName);
+    delete userBasket.basket[itemName];
+    showBasketContent();
+}
+
+
+
 createBasketView();
+
 let countPrice = document.querySelector(".count-basket")
 countPrice.addEventListener('click', viewBasketPrice)
+
 
 
 let productsCatalog = [item1, item2, item3];
@@ -127,6 +174,8 @@ function showCatalog(products) {
         console.log(boundPopup)
         btnAddtoBasket.addEventListener("click", (event) => userBasket.addToBasket(event.target.productId)); //добавление в корзину
         btnAddtoAmount.addEventListener("click", (event) => userBasket.addItemAmount(event.target.productId.name)); //увеличение количества в корзине
+        btnAddtoBasket.addEventListener("click", () => showBasketContent()); //демонстрируем содержимое корзины
+        btnAddtoAmount.addEventListener("click", () => showBasketContent()); //демонстрируем содержимое корзины
         boundPopup.addEventListener("click", function (event) {
             let popup = document.querySelector('.popup');
             popup.classList.add('open');
@@ -143,3 +192,4 @@ function showCatalog(products) {
     btnClosePopup.addEventListener('click', hidePopup);
 }
 showCatalog(productsCatalog);
+

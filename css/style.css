@@ -72,3 +72,13 @@
     font-size: 55px;
     color: #9e9e9e;
 }
+
+.basket-item {
+    max-width: 650px;
+}
+
+.item-list {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
