@@ -1,3 +1,8 @@
+.main-container {
+    margin-left: 15px;
+    margin-top: 15px;
+}
+
 .card {
     display: flex;
     max-width: 300px;
@@ -74,11 +79,32 @@
 }
 
 .basket-item {
-    max-width: 650px;
+    max-width: 700px;
 }
 
 .item-list {
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.hidden {
+    display: none;
+}
+
+.btn-success {
+    margin-left: 5px;
+}
+
+.form-control {
+    margin-top: 5px;
+    max-width: 500px;
+}
+
+.basket-container {
+    margin-bottom: 25px;
+}
+
+.basket-container {
+    margin-top: 5px;
 }

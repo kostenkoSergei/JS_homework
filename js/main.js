@@ -4,11 +4,17 @@ let userBasket = {
         this.basket[item.name] = { name: item.name, price: item.price, amount: item.amount, img: item.img }
     },
     addItemAmount: function (itemName) {
-        console.log(itemName)
         if (itemName in this.basket) {
             this.basket[itemName]['amount'] += 1; // увеличиваем число едениц товара
         }
     },
+
+    subItemAmount: function (itemName) {
+        if (itemName in this.basket) {
+            this.basket[itemName]['amount'] -= 1; // уменьшаем число едениц товара
+        }
+    },
+
     countBasketPrice: function () {
         let basketPrice = 0;
         let basketAmount = 0;
@@ -41,7 +47,7 @@ function createBasketView() {
     let basketView = document.getElementsByClassName('basket');
     let basketImg = document.createElement('img');
     basketImg.src = "img/basket.png";
-    basketImg.style.maxWidth = '150px';
+    basketImg.style.maxWidth = '100px';
     basketView[0].appendChild(basketImg);
     let basketText = document.createElement('p');
     basketText.className = 'basket-text';
@@ -72,6 +78,12 @@ function viewBasketPrice() {
 
 // Показывает содержимое корзины
 function showBasketContent() {
+    let confirmOrderBtn = document.querySelector('.step-ahead-1'); // кнопка Далее для подтверждения корзины и перехода к адресу
+
+    if (Object.values(userBasket.basket).length > 0) {
+        confirmOrderBtn.classList.remove("hidden");
+        confirmOrderBtn.addEventListener('click', getOrderingDetails);
+    }
     let basketContent = document.querySelector('.basket-content');
     while (basketContent.firstChild) {
         basketContent.removeChild(basketContent.firstChild);
@@ -85,18 +97,60 @@ function showBasketContent() {
         itemImg.src = `img/${basketItems[i].img[0]}.jpg`;
         itemImg.style.maxWidth = '10%';
 
-        let itemInfo = document.createElement('p');
-        itemInfo.innerHTML = `&nbsp&nbsp&nbspнаименование: ${basketItems[i].name}  |   кол-во: ${basketItems[i].amount}  |  цена за 1 шт.: ${basketItems[i].price}&nbsp`;
+        let itemInfo = document.createElement('div');
+        itemInfo.innerHTML = `&nbsp&nbsp&nbspтовар: ${basketItems[i].name}  |  кол-во: ${basketItems[i].amount}  |  цена за 1 шт.: ${basketItems[i].price}`;
 
+        let changeAmountButtons = document.createElement('div');
+        changeAmountButtons.style.minWidth = '150px'
+
+        // кнопка полного удаления товара из корзины
         let deleteBtn = document.createElement('a');
         deleteBtn.classList.add('btn', 'btn-primary', 'btn-sm');
         deleteBtn.innerText = 'удалить';
+        deleteBtn.style.margin = '5px';
         deleteBtn.productId = basketItems[i].name;
         deleteBtn.addEventListener("click", (event) => deleteItemFromBasket(event.target.productId)); //удаляем товар из корзины
 
+        // кнопка добавления количества товара в корзине
+        let addOneItemBtn = document.createElement('a');
+        addOneItemBtn.classList.add('btn', 'btn-secondary', 'btn-sm');
+        addOneItemBtn.innerText = '+1';
+        addOneItemBtn.productId = basketItems[i].name;
+
+        addOneItemBtn.addEventListener("click", (event) => {
+            console.log(Object.values(userBasket.basket).length)
+            userBasket.addItemAmount(event.target.productId); //добавляем +1 к товару в корзине
+            showBasketContent();
+            viewBasketPrice();
+        });
+
+
+        // кнопка добавления количества товара в корзине
+        let subOneItemBtn = document.createElement('a');
+        subOneItemBtn.classList.add('btn', 'btn-secondary', 'btn-sm');
+        subOneItemBtn.innerText = '- 1';
+        subOneItemBtn.productId = basketItems[i].name;
+        subOneItemBtn.addEventListener("click", (event) => {
+            userBasket.subItemAmount(event.target.productId); //-1 к товару в корзине
+            showBasketContent();
+            viewBasketPrice();
+            console.log(event.target.productId)
+            let currentAmount = userBasket.basket[event.target.productId].amount;
+            console.log(currentAmount);
+            if (currentAmount == 0) {
+                deleteItemFromBasket(event.target.productId);
+            }
+        });
+
+        changeAmountButtons.appendChild(addOneItemBtn);
+        changeAmountButtons.appendChild(deleteBtn);
+        changeAmountButtons.appendChild(subOneItemBtn);
+
         basketItem.appendChild(itemImg);
         basketItem.appendChild(itemInfo);
-        basketItem.appendChild(deleteBtn);
+
+        basketItem.appendChild(changeAmountButtons);
+
 
         basketContent.appendChild(basketItem);
     }
@@ -104,18 +158,13 @@ function showBasketContent() {
 
 // Удаляет элемент из корзины
 function deleteItemFromBasket(itemName) {
-    console.log(itemName);
     delete userBasket.basket[itemName];
     showBasketContent();
+    viewBasketPrice();
 }
 
 
-
 createBasketView();
-
-let countPrice = document.querySelector(".count-basket")
-countPrice.addEventListener('click', viewBasketPrice)
-
 
 
 let productsCatalog = [item1, item2, item3];
@@ -171,11 +220,27 @@ function showCatalog(products) {
         let btnAddtoBasket = document.querySelector(`.btn-${i}`);
         let btnAddtoAmount = document.querySelector(`.btn-add-${i}`);
         let boundPopup = document.querySelector(`.img-${i}`);
-        console.log(boundPopup)
-        btnAddtoBasket.addEventListener("click", (event) => userBasket.addToBasket(event.target.productId)); //добавление в корзину
-        btnAddtoAmount.addEventListener("click", (event) => userBasket.addItemAmount(event.target.productId.name)); //увеличение количества в корзине
-        btnAddtoBasket.addEventListener("click", () => showBasketContent()); //демонстрируем содержимое корзины
-        btnAddtoAmount.addEventListener("click", () => showBasketContent()); //демонстрируем содержимое корзины
+
+        btnAddtoBasket.addEventListener("click", (event) => {
+            userBasket.addToBasket(event.target.productId); //добавление в корзину
+            viewBasketPrice();
+        })
+
+        btnAddtoAmount.addEventListener("click", (event) => {
+            userBasket.addItemAmount(event.target.productId.name); //увеличение количества в корзине
+            viewBasketPrice();
+        })
+
+        btnAddtoBasket.addEventListener("click", () => {
+            showBasketContent(); //демонстрируем содержимое корзины
+            viewBasketPrice();
+        })
+
+        btnAddtoAmount.addEventListener("click", () => {
+            showBasketContent(); //демонстрируем содержимое корзины
+            viewBasketPrice();
+        })
+
         boundPopup.addEventListener("click", function (event) {
             let popup = document.querySelector('.popup');
             popup.classList.add('open');
@@ -192,4 +257,66 @@ function showCatalog(products) {
     btnClosePopup.addEventListener('click', hidePopup);
 }
 showCatalog(productsCatalog);
+
+
+
+function getOrderingDetails() {
+    let confirmOrderBtn = document.querySelector('.step-ahead-1'); // кнопка Далее для подтверждения корзины и перехода к адресу
+    let confirmAddressBtn = document.querySelector('.step-ahead-2'); // кнопка Далее для подтверждения адреса и перехода к комментарию
+    let backAddressBtn = document.querySelector('.step-back-1'); // кнопка Назад для поля адреса
+    let backCommentBtn = document.querySelector('.step-back-2'); // кнопка Назад для поля комментария
+
+
+    let basketMenu = document.querySelector('.basket-menu');
+    let basketItemsView = document.querySelector('.basket-content');
+    basketItemsView.classList.add('hidden');
+
+
+    let addressField = document.createElement('textarea');
+    addressField.classList.add("form-control", "user-data1");
+    addressField.rows = "3";
+    addressField.placeholder = "Введите адрес доставки";
+
+    let commentField = document.createElement("textarea");
+    commentField.classList.add("form-control", "hidden", "user-data2");
+    commentField.rows = "3";
+    commentField.placeholder = "Введите комментарий";
+
+    if (document.querySelector('.user-data1') == null && document.querySelector('.user-data2') == null) {
+        console.log('hello')
+        basketMenu.appendChild(addressField);
+        basketMenu.appendChild(commentField);
+    }
+
+    confirmOrderBtn.classList.add('hidden');
+    confirmAddressBtn.classList.remove('hidden');
+    backAddressBtn.classList.remove('hidden');
+
+    confirmAddressBtn.addEventListener('click', () => {
+        commentField.classList.remove('hidden');
+        addressField.classList.add('hidden');
+        backAddressBtn.classList.add('hidden');
+        backCommentBtn.classList.remove('hidden');
+        confirmAddressBtn.classList.add('hidden');
+
+    })
+
+    backAddressBtn.addEventListener('click', () => {
+        basketItemsView.classList.remove('hidden');
+        addressField.classList.add('hidden');
+        confirmOrderBtn.classList.remove('hidden');
+        confirmAddressBtn.classList.add('hidden');
+        backAddressBtn.classList.add('hidden')
+    })
+
+    backCommentBtn.addEventListener('click', () => {
+        addressField.classList.remove('hidden');
+        commentField.classList.add('hidden');
+        backAddressBtn.classList.remove('hidden');
+        backCommentBtn.classList.add('hidden');
+        confirmAddressBtn.classList.remove('hidden')
+    })
+
+    confirmOrderBtn.addEventListener('click', () => addressField.classList.remove('hidden'));
+}
 
