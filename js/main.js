@@ -265,6 +265,7 @@ function getOrderingDetails() {
     let confirmAddressBtn = document.querySelector('.step-ahead-2'); // кнопка Далее для подтверждения адреса и перехода к комментарию
     let backAddressBtn = document.querySelector('.step-back-1'); // кнопка Назад для поля адреса
     let backCommentBtn = document.querySelector('.step-back-2'); // кнопка Назад для поля комментария
+    let sendOrderBtn = document.querySelector('.send-order'); // кнопка завершения заказа и отправки его ользователем
 
 
     let basketMenu = document.querySelector('.basket-menu');
@@ -297,6 +298,7 @@ function getOrderingDetails() {
         addressField.classList.add('hidden');
         backAddressBtn.classList.add('hidden');
         backCommentBtn.classList.remove('hidden');
+        sendOrderBtn.classList.remove('hidden');
         confirmAddressBtn.classList.add('hidden');
 
     })
@@ -314,6 +316,7 @@ function getOrderingDetails() {
         commentField.classList.add('hidden');
         backAddressBtn.classList.remove('hidden');
         backCommentBtn.classList.add('hidden');
+        sendOrderBtn.classList.add('hidden');
         confirmAddressBtn.classList.remove('hidden')
     })
 
